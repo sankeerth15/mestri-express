@@ -1,22 +1,28 @@
 {
-  "name": "mestri-express-backend",
-  "version": "1.0.0",
-  "description": "Backend API for Mestri-Express construction materials delivery",
-  "main": "api/index.js",
-  "type": "module",
+  "name": "mestri-express",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "dev": "node api/index.js",
-    "start": "node api/index.js"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
- "dependencies": {
-  "express": "^4.18.2",
-  "cors": "^2.8.5",
-  "dotenv": "^16.3.1",
-  "@supabase/supabase-js": "^2.38.0",
-  "axios": "^1.6.0",
-  "razorpay": "^2.9.1",
-  "uuid": "^9.0.1"
-},
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "next": "^14.0.0",
+    "axios": "^1.6.0",
+    "leaflet": "^1.9.4",
+    "react-leaflet": "^4.2.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/node": "^20.0.0",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.24",
+    "tailwindcss": "^3.3.0"
+  },
   "engines": {
     "node": "24.x"
   }
