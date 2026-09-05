@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "Mestri-Express",
+    "slug": "mestri-express",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#50AD41"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mestri.express"
+    },
+    "android": {
+      "package": "com.mestri.express"
+    },
+    "plugins": []
+  }
+}
