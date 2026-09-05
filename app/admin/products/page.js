@@ -16,6 +16,8 @@ export default function ProductsPage() {
     price: '',
     sellingPrice: '',
     quantity: '',
+    unit: '', // NEW: e.g., 'kg', 'litre', 'day', 'hour', 'piece', 'bag'
+    bulkDiscount: '', // NEW: e.g., '10' for 10% discount
   })
 
   useEffect(() => {
@@ -47,10 +49,21 @@ export default function ProductsPage() {
           price: parseFloat(formData.price),
           sellingPrice: parseFloat(formData.sellingPrice),
           quantity: parseInt(formData.quantity),
+          unit: formData.unit, // SEND unit to API
+          bulkDiscount: parseFloat(formData.bulkDiscount || 0), // SEND bulk discount to API
         }
       )
       alert('Product created successfully!')
-      setFormData({ name: '', description: '', brand: '', price: '', sellingPrice: '', quantity: '' })
+      setFormData({ 
+        name: '', 
+        description: '', 
+        brand: '', 
+        price: '', 
+        sellingPrice: '', 
+        quantity: '',
+        unit: '',
+        bulkDiscount: '',
+      })
       setShowForm(false)
       fetchProducts()
     } catch (error) {
@@ -88,6 +101,7 @@ export default function ProductsPage() {
         <div className="bg-white rounded-lg p-6 shadow mb-8">
           <h2 className="text-xl font-bold mb-4">Add New Product</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Product Name */}
             <input
               type="text"
               placeholder="Product Name"
@@ -95,6 +109,8 @@ export default function ProductsPage() {
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary"
             />
+
+            {/* Brand */}
             <input
               type="text"
               placeholder="Brand"
@@ -102,6 +118,8 @@ export default function ProductsPage() {
               onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
               className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary"
             />
+
+            {/* Description */}
             <textarea
               placeholder="Description"
               value={formData.description}
@@ -109,6 +127,8 @@ export default function ProductsPage() {
               className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary md:col-span-2"
               rows="3"
             />
+
+            {/* MRP Price */}
             <input
               type="number"
               placeholder="MRP Price"
@@ -116,6 +136,8 @@ export default function ProductsPage() {
               onChange={(e) => setFormData({ ...formData, price: e.target.value })}
               className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary"
             />
+
+            {/* Selling Price (with GST) */}
             <input
               type="number"
               placeholder="Selling Price (with GST)"
@@ -123,6 +145,8 @@ export default function ProductsPage() {
               onChange={(e) => setFormData({ ...formData, sellingPrice: e.target.value })}
               className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary"
             />
+
+            {/* Quantity in Stock */}
             <input
               type="number"
               placeholder="Quantity in Stock"
@@ -130,6 +154,29 @@ export default function ProductsPage() {
               onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
               className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary"
             />
+
+            {/* NEW: Unit */}
+            <input
+              type="text"
+              placeholder="Unit (kg, litre, day, hour, piece, bag, meter, etc.)"
+              value={formData.unit}
+              onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary"
+            />
+
+            {/* NEW: Bulk Discount Percentage */}
+            <input
+              type="number"
+              placeholder="Bulk Discount % (e.g., 10 for 10% off)"
+              value={formData.bulkDiscount}
+              onChange={(e) => setFormData({ ...formData, bulkDiscount: e.target.value })}
+              step="0.01"
+              min="0"
+              max="100"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary"
+            />
+
+            {/* Submit Button */}
             <button
               onClick={handleCreateProduct}
               className="btn-primary md:col-span-2"
@@ -165,6 +212,7 @@ export default function ProductsPage() {
                 <th className="px-6 py-3 text-left font-semibold">Name</th>
                 <th className="px-6 py-3 text-left font-semibold">Brand</th>
                 <th className="px-6 py-3 text-left font-semibold">Price</th>
+                <th className="px-6 py-3 text-left font-semibold">Unit</th>
                 <th className="px-6 py-3 text-left font-semibold">Stock</th>
                 <th className="px-6 py-3 text-left font-semibold">Status</th>
                 <th className="px-6 py-3 text-left font-semibold">Actions</th>
@@ -183,6 +231,9 @@ export default function ProductsPage() {
                     {product.price > product.selling_price && (
                       <div className="text-xs text-gray-500 line-through">₹{product.price}</div>
                     )}
+                  </td>
+                  <td className="px-6 py-4 font-medium">
+                    {product.unit || 'N/A'}
                   </td>
                   <td className="px-6 py-4">
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${
