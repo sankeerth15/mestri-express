@@ -307,30 +307,29 @@ export default function ProductsPage() {
                       </span>
                     )}
                   </td>
-                 <td className="px-6 py-4 flex gap-2">
-  <button
-    onClick={() => toggleProductVisibility(product.id, product.is_active)}
-    className={`px-3 py-1 rounded text-sm font-medium ${
-      product.is_active
-        ? 'bg-red-100 text-red-700 hover:bg-red-200'
-        : 'bg-green-100 text-green-700 hover:bg-green-200'
-    }`}
-  >
-    {product.is_active ? 'Hide' : 'Show'}
-  </button>
-  <button
-    onClick={() => handleDeleteProduct(product.id)}
-    className="px-3 py-1 rounded text-sm font-medium bg-red-100 text-red-700 hover:bg-red-200"
-  >
-    Delete
-  </button>
-</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+                <td className="px-6 py-4 flex gap-2">
+                  <button
+                    onClick={() => toggleProductVisibility(product.id, product.is_active)}
+                    className={`px-3 py-1 rounded text-sm font-medium ${
+                      product.is_active
+                        ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                        : 'bg-green-100 text-green-700 hover:bg-green-200'
+                    }`}
+                  >
+                    {product.is_active ? 'Hide' : 'Show'}
+                  </button>
+                  <button
+                    onClick={() => handleDeleteProduct(product.id)}
+                    className="px-3 py-1 rounded text-sm font-medium bg-red-100 text-red-700 hover:bg-red-200"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   )
 }
