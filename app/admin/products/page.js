@@ -2,7 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-import Link from 'next/link'
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+)
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([])
@@ -29,10 +34,13 @@ export default function ProductsPage() {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL || 'https://mestri-express.vercel.app'}/api/categories`
-      )
-      setCategories(response.data.categories || [])
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name', { ascending: true })
+
+      if (error) throw error
+      setCategories(data || [])
     } catch (error) {
       console.error('Error fetching categories:', error)
     }
