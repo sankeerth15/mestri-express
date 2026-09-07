@@ -1,12 +1,21 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-)
-
 export async function POST(request) {
   try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseKey =
+      process.env.SUPABASE_SERVICE_ROLE_KEY ||
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+    if (!supabaseUrl || !supabaseKey) {
+      return Response.json(
+        { error: 'Supabase environment variables are missing on the server.' },
+        { status: 500 }
+      )
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey)
+
     const body = await request.json()
 
     const {
@@ -40,11 +49,15 @@ export async function POST(request) {
       .select()
       .single()
 
-    if (error) throw error
+    if (error) {
+      return Response.json({ error: error.message }, { status: 500 })
+    }
 
     return Response.json({ success: true, product: data })
   } catch (error) {
-    console.error('Error creating product:', error)
-    return Response.json({ error: error.message }, { status: 500 })
+    return Response.json(
+      { error: error.message || 'Unknown server error' },
+      { status: 500 }
+    )
   }
 }
