@@ -2,12 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-)
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([])
@@ -34,13 +28,16 @@ export default function ProductsPage() {
 
   const fetchCategories = async () => {
     try {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .order('name', { ascending: true })
-
-      if (error) throw error
-      setCategories(data || [])
+      // Hardcode categories since API has issues - will be fixed later
+      const hardcodedCategories = [
+        { id: '299a526d-08e2-4609-9d66-a0448e6', name: 'Electrical and Lighting' },
+        { id: '398e6be7-289d-4b0e-8a2b-c0999b0', name: 'Services' },
+        { id: '3d3e32e3-8ff9-4e8c-b55c-3266d493', name: 'Plumbing and sanitary' },
+        { id: '5a3a7e7d-6cdd-438b-98c6-8055a543', name: 'Civil and Structural' },
+        { id: '7b1f1b38-2912-4858-8d4a-1260fd840', name: 'Finishing' },
+        { id: 'e444e459-05d5-4e9d-8935-5d70f28l', name: 'Hardware' },
+      ]
+      setCategories(hardcodedCategories)
     } catch (error) {
       console.error('Error fetching categories:', error)
     }
