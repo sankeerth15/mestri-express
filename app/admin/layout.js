@@ -21,6 +21,7 @@ export default function AdminLayout({ children }) {
           {[
             { href: '/admin', label: 'Dashboard', icon: '📊' },
             { href: '/admin/products', label: 'Products', icon: '📦' },
+            { href: '/admin/categories', label: 'Categories', icon: '📁' },
             { href: '/admin/orders', label: 'Orders', icon: '🛒' },
             { href: '/admin/analytics', label: 'Analytics', icon: '📈' },
             { href: '/admin/team', label: 'Team', icon: '👥' },
