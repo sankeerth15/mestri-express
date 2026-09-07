@@ -77,7 +77,6 @@ export default function CategoriesPage() {
         </button>
       </div>
 
-      {/* Create Category Form */}
       {showForm && (
         <div className="bg-white rounded-lg p-6 shadow mb-8">
           <h2 className="text-xl font-bold mb-4">Add New Category</h2>
@@ -99,7 +98,6 @@ export default function CategoriesPage() {
         </div>
       )}
 
-      {/* Categories Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         {loading ? (
           <div className="p-8 text-center">Loading categories...</div>
