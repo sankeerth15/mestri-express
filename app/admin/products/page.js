@@ -6,6 +6,7 @@ import Link from 'next/link'
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([])
+  const [categories, setCategories] = useState([]) // NEW: Categories list
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [showForm, setShowForm] = useState(false)
@@ -13,16 +14,30 @@ export default function ProductsPage() {
     name: '',
     description: '',
     brand: '',
+    categoryId: '', // NEW: Category dropdown
     price: '',
     sellingPrice: '',
     quantity: '',
-    unit: '', // NEW: e.g., 'kg', 'litre', 'day', 'hour', 'piece', 'bag'
-    bulkDiscount: '', // NEW: e.g., '10' for 10% discount
+    unit: '',
+    bulkDiscount: '',
   })
 
   useEffect(() => {
+    fetchCategories() // NEW: Fetch categories on load
     fetchProducts()
   }, [])
+
+  // NEW: Fetch categories from database
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL || 'https://mestri-express.vercel.app'}/api/categories`
+      )
+      setCategories(response.data.categories || [])
+    } catch (error) {
+      console.error('Error fetching categories:', error)
+    }
+  }
 
   const fetchProducts = async () => {
     try {
@@ -39,6 +54,12 @@ export default function ProductsPage() {
   }
 
   const handleCreateProduct = async () => {
+    // Validation: Check if category is selected
+    if (!formData.categoryId) {
+      alert('Please select a category')
+      return
+    }
+
     try {
       await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL || 'https://mestri-express.vercel.app'}/api/admin/products`,
@@ -46,18 +67,20 @@ export default function ProductsPage() {
           name: formData.name,
           description: formData.description,
           brand: formData.brand,
+          category_id: formData.categoryId, // FIXED: Match database field name
           price: parseFloat(formData.price),
-          sellingPrice: parseFloat(formData.sellingPrice),
-          quantity: parseInt(formData.quantity),
-          unit: formData.unit, // SEND unit to API
-          bulkDiscount: parseFloat(formData.bulkDiscount || 0), // SEND bulk discount to API
+          selling_price: parseFloat(formData.sellingPrice), // FIXED: Match database field name
+          quantity_in_stock: parseInt(formData.quantity), // FIXED: Match database field name
+          unit: formData.unit,
+          bulk_discount_percent: parseFloat(formData.bulkDiscount || 0), // FIXED: Match database field name
         }
       )
       alert('Product created successfully!')
       setFormData({ 
         name: '', 
         description: '', 
-        brand: '', 
+        brand: '',
+        categoryId: '', // FIXED: Reset category
         price: '', 
         sellingPrice: '', 
         quantity: '',
@@ -67,7 +90,7 @@ export default function ProductsPage() {
       setShowForm(false)
       fetchProducts()
     } catch (error) {
-      alert('Error creating product: ' + error.message)
+      alert('Error creating product: ' + error.response?.data?.message || error.message)
     }
   }
 
@@ -75,7 +98,7 @@ export default function ProductsPage() {
     try {
       await axios.patch(
         `${process.env.NEXT_PUBLIC_API_URL || 'https://mestri-express.vercel.app'}/api/admin/products/${productId}/toggle`,
-        { isActive: !currentStatus }
+        { is_active: !currentStatus } // FIXED: Match database field name
       )
       alert('Product visibility updated!')
       fetchProducts()
@@ -101,6 +124,21 @@ export default function ProductsPage() {
         <div className="bg-white rounded-lg p-6 shadow mb-8">
           <h2 className="text-xl font-bold mb-4">Add New Product</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            {/* NEW: Category Dropdown */}
+            <select
+              value={formData.categoryId}
+              onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary"
+            >
+              <option value="">Select a Category</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+
             {/* Product Name */}
             <input
               type="text"
@@ -155,7 +193,7 @@ export default function ProductsPage() {
               className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary"
             />
 
-            {/* NEW: Unit */}
+            {/* Unit */}
             <input
               type="text"
               placeholder="Unit (kg, litre, day, hour, piece, bag, meter, etc.)"
@@ -164,7 +202,7 @@ export default function ProductsPage() {
               className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary"
             />
 
-            {/* NEW: Bulk Discount Percentage */}
+            {/* Bulk Discount Percentage */}
             <input
               type="number"
               placeholder="Bulk Discount % (e.g., 10 for 10% off)"
