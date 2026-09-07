@@ -28,16 +28,16 @@ export default function ProductsPage() {
 
   const fetchCategories = async () => {
     try {
-      // Hardcode categories since API has issues - will be fixed later
-      const hardcodedCategories = [
-        { id: '299a526d-08e2-4609-9d66-a0448e6', name: 'Electrical and Lighting' },
-        { id: '398e6be7-289d-4b0e-8a2b-c0999b0', name: 'Services' },
-        { id: '3d3e32e3-8ff9-4e8c-b55c-3266d493', name: 'Plumbing and sanitary' },
-        { id: '5a3a7e7d-6cdd-438b-98c6-8055a543', name: 'Civil and Structural' },
-        { id: '7b1f1b38-2912-4858-8d4a-1260fd840', name: 'Finishing' },
-        { id: 'e444e459-05d5-4e9d-8935-5d70f28l', name: 'Hardware' },
+      // REAL category IDs from Supabase database
+      const realCategories = [
+        { id: '5a3a7e7d-6cdd-438b-98c6-8055a543aa3d', name: 'Civil and Structural' },
+        { id: '7b1f1b38-2912-4858-8d4a-1260fd840b5c', name: 'Finishing' },
+        { id: '299a526d-08e2-4609-9d66-a0448e6f7a6f', name: 'Electrical and Lighting' },
+        { id: '3d3e32e3-81f9-4e8c-b55c-3266d4933a14', name: 'Plumbing and sanitary' },
+        { id: 'e444e459-05d5-4e9d-8935-5d70f28b1cc4', name: 'Hardware' },
+        { id: '398e6be7-289d-4b0e-8a2b-c0999b05afc8', name: 'Services' },
       ]
-      setCategories(hardcodedCategories)
+      setCategories(realCategories)
     } catch (error) {
       console.error('Error fetching categories:', error)
     }
@@ -65,17 +65,17 @@ export default function ProductsPage() {
 
     try {
       await axios.post(
-  `${process.env.NEXT_PUBLIC_API_URL || 'https://mestri-express.vercel.app'}/api/admin/products/create`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'https://mestri-express.vercel.app'}/api/admin/products/create`,
         {
           name: formData.name,
           description: formData.description,
           brand: formData.brand,
-          category_id: formData.categoryId,
+          categoryId: formData.categoryId,
           price: parseFloat(formData.price),
-          selling_price: parseFloat(formData.sellingPrice),
-          quantity_in_stock: parseInt(formData.quantity),
+          sellingPrice: parseFloat(formData.sellingPrice),
+          quantity: parseInt(formData.quantity),
           unit: formData.unit,
-          bulk_discount_percent: parseFloat(formData.bulkDiscount || 0),
+          bulkDiscount: parseFloat(formData.bulkDiscount || 0),
         }
       )
       alert('Product created successfully!')
@@ -93,7 +93,7 @@ export default function ProductsPage() {
       setShowForm(false)
       fetchProducts()
     } catch (error) {
-      alert('Error creating product: ' + (error.response?.data?.message || error.message))
+      alert('Error creating product: ' + (error.response?.data?.error || error.message))
     }
   }
 
