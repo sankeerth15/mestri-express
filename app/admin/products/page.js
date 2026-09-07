@@ -53,7 +53,21 @@ export default function ProductsPage() {
     }
   }
 
-  const handleCreateProduct = async () => {
+  const handleDeleteProduct = async (productId) => {
+  if (!confirm('Are you sure you want to delete this product?')) {
+    return
+  }
+
+  try {
+    await axios.delete(
+      `${process.env.NEXT_PUBLIC_API_URL || 'https://mestri-express.vercel.app'}/api/admin/products/${productId}`
+    )
+    alert('Product deleted successfully!')
+    fetchProducts()
+  } catch (error) {
+    alert('Error deleting product: ' + error.message)
+  }
+}
     // Validation: Check if category is selected
     if (!formData.categoryId) {
       alert('Please select a category')
@@ -293,18 +307,24 @@ export default function ProductsPage() {
                       </span>
                     )}
                   </td>
-                  <td className="px-6 py-4">
-                    <button
-                      onClick={() => toggleProductVisibility(product.id, product.is_active)}
-                      className={`px-3 py-1 rounded text-sm font-medium ${
-                        product.is_active
-                          ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                          : 'bg-green-100 text-green-700 hover:bg-green-200'
-                      }`}
-                    >
-                      {product.is_active ? 'Hide' : 'Show'}
-                    </button>
-                  </td>
+                 <td className="px-6 py-4 flex gap-2">
+  <button
+    onClick={() => toggleProductVisibility(product.id, product.is_active)}
+    className={`px-3 py-1 rounded text-sm font-medium ${
+      product.is_active
+        ? 'bg-red-100 text-red-700 hover:bg-red-200'
+        : 'bg-green-100 text-green-700 hover:bg-green-200'
+    }`}
+  >
+    {product.is_active ? 'Hide' : 'Show'}
+  </button>
+  <button
+    onClick={() => handleDeleteProduct(product.id)}
+    className="px-3 py-1 rounded text-sm font-medium bg-red-100 text-red-700 hover:bg-red-200"
+  >
+    Delete
+  </button>
+</td>
                 </tr>
               ))}
             </tbody>
