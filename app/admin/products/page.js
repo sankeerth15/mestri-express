@@ -65,7 +65,7 @@ export default function ProductsPage() {
 
     try {
       await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL || 'https://mestri-express.vercel.app'}/api/admin/products`,
+  `${process.env.NEXT_PUBLIC_API_URL || 'https://mestri-express.vercel.app'}/api/admin/products/create`,
         {
           name: formData.name,
           description: formData.description,
