@@ -6,7 +6,7 @@ import Link from 'next/link'
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([])
-  const [categories, setCategories] = useState([]) // NEW: Categories list
+  const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [showForm, setShowForm] = useState(false)
@@ -14,7 +14,7 @@ export default function ProductsPage() {
     name: '',
     description: '',
     brand: '',
-    categoryId: '', // NEW: Category dropdown
+    categoryId: '',
     price: '',
     sellingPrice: '',
     quantity: '',
@@ -23,11 +23,10 @@ export default function ProductsPage() {
   })
 
   useEffect(() => {
-    fetchCategories() // NEW: Fetch categories on load
+    fetchCategories()
     fetchProducts()
   }, [])
 
-  // NEW: Fetch categories from database
   const fetchCategories = async () => {
     try {
       const response = await axios.get(
@@ -53,22 +52,7 @@ export default function ProductsPage() {
     }
   }
 
-  const handleDeleteProduct = async (productId) => {
-  if (!confirm('Are you sure you want to delete this product?')) {
-    return
-  }
-
-  try {
-    await axios.delete(
-      `${process.env.NEXT_PUBLIC_API_URL || 'https://mestri-express.vercel.app'}/api/admin/products/${productId}`
-    )
-    alert('Product deleted successfully!')
-    fetchProducts()
-  } catch (error) {
-    alert('Error deleting product: ' + error.message)
-  }
-}
-    // Validation: Check if category is selected
+  const handleCreateProduct = async () => {
     if (!formData.categoryId) {
       alert('Please select a category')
       return
@@ -81,22 +65,22 @@ export default function ProductsPage() {
           name: formData.name,
           description: formData.description,
           brand: formData.brand,
-          category_id: formData.categoryId, // FIXED: Match database field name
+          category_id: formData.categoryId,
           price: parseFloat(formData.price),
-          selling_price: parseFloat(formData.sellingPrice), // FIXED: Match database field name
-          quantity_in_stock: parseInt(formData.quantity), // FIXED: Match database field name
+          selling_price: parseFloat(formData.sellingPrice),
+          quantity_in_stock: parseInt(formData.quantity),
           unit: formData.unit,
-          bulk_discount_percent: parseFloat(formData.bulkDiscount || 0), // FIXED: Match database field name
+          bulk_discount_percent: parseFloat(formData.bulkDiscount || 0),
         }
       )
       alert('Product created successfully!')
-      setFormData({ 
-        name: '', 
-        description: '', 
+      setFormData({
+        name: '',
+        description: '',
         brand: '',
-        categoryId: '', // FIXED: Reset category
-        price: '', 
-        sellingPrice: '', 
+        categoryId: '',
+        price: '',
+        sellingPrice: '',
         quantity: '',
         unit: '',
         bulkDiscount: '',
@@ -104,7 +88,7 @@ export default function ProductsPage() {
       setShowForm(false)
       fetchProducts()
     } catch (error) {
-      alert('Error creating product: ' + error.response?.data?.message || error.message)
+      alert('Error creating product: ' + (error.response?.data?.message || error.message))
     }
   }
 
@@ -112,12 +96,28 @@ export default function ProductsPage() {
     try {
       await axios.patch(
         `${process.env.NEXT_PUBLIC_API_URL || 'https://mestri-express.vercel.app'}/api/admin/products/${productId}/toggle`,
-        { is_active: !currentStatus } // FIXED: Match database field name
+        { is_active: !currentStatus }
       )
       alert('Product visibility updated!')
       fetchProducts()
     } catch (error) {
       alert('Error updating product: ' + error.message)
+    }
+  }
+
+  const handleDeleteProduct = async (productId) => {
+    if (!confirm('Are you sure you want to delete this product?')) {
+      return
+    }
+
+    try {
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_API_URL || 'https://mestri-express.vercel.app'}/api/admin/products/${productId}`
+      )
+      alert('Product deleted successfully!')
+      fetchProducts()
+    } catch (error) {
+      alert('Error deleting product: ' + error.message)
     }
   }
 
@@ -138,8 +138,7 @@ export default function ProductsPage() {
         <div className="bg-white rounded-lg p-6 shadow mb-8">
           <h2 className="text-xl font-bold mb-4">Add New Product</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            
-            {/* NEW: Category Dropdown */}
+            {/* Category Dropdown */}
             <select
               value={formData.categoryId}
               onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
@@ -189,7 +188,7 @@ export default function ProductsPage() {
               className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary"
             />
 
-            {/* Selling Price (with GST) */}
+            {/* Selling Price */}
             <input
               type="number"
               placeholder="Selling Price (with GST)"
@@ -198,7 +197,7 @@ export default function ProductsPage() {
               className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary"
             />
 
-            {/* Quantity in Stock */}
+            {/* Quantity */}
             <input
               type="number"
               placeholder="Quantity in Stock"
@@ -216,7 +215,7 @@ export default function ProductsPage() {
               className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary"
             />
 
-            {/* Bulk Discount Percentage */}
+            {/* Bulk Discount */}
             <input
               type="number"
               placeholder="Bulk Discount % (e.g., 10 for 10% off)"
@@ -275,24 +274,28 @@ export default function ProductsPage() {
                 <tr key={product.id} className="border-b hover:bg-gray-50">
                   <td className="px-6 py-4">
                     <div className="font-medium">{product.name}</div>
-                    <div className="text-sm text-gray-600">{product.description?.substring(0, 50)}</div>
+                    <div className="text-sm text-gray-600">
+                      {product.description?.substring(0, 50)}
+                    </div>
                   </td>
                   <td className="px-6 py-4">{product.brand || 'N/A'}</td>
                   <td className="px-6 py-4">
                     <div className="text-primary font-bold">₹{product.selling_price}</div>
                     {product.price > product.selling_price && (
-                      <div className="text-xs text-gray-500 line-through">₹{product.price}</div>
+                      <div className="text-xs text-gray-500 line-through">
+                        ₹{product.price}
+                      </div>
                     )}
                   </td>
-                  <td className="px-6 py-4 font-medium">
-                    {product.unit || 'N/A'}
-                  </td>
+                  <td className="px-6 py-4 font-medium">{product.unit || 'N/A'}</td>
                   <td className="px-6 py-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      product.quantity_in_stock > 0 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
-                    }`}>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        product.quantity_in_stock > 0
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}
+                    >
                       {product.quantity_in_stock}
                     </span>
                   </td>
@@ -307,29 +310,32 @@ export default function ProductsPage() {
                       </span>
                     )}
                   </td>
-                <td className="px-6 py-4 flex gap-2">
-                  <button
-                    onClick={() => toggleProductVisibility(product.id, product.is_active)}
-                    className={`px-3 py-1 rounded text-sm font-medium ${
-                      product.is_active
-                        ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                        : 'bg-green-100 text-green-700 hover:bg-green-200'
-                    }`}
-                  >
-                    {product.is_active ? 'Hide' : 'Show'}
-                  </button>
-                  <button
-                    onClick={() => handleDeleteProduct(product.id)}
-                    className="px-3 py-1 rounded text-sm font-medium bg-red-100 text-red-700 hover:bg-red-200"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+                  <td className="px-6 py-4 flex gap-2">
+                    <button
+                      onClick={() =>
+                        toggleProductVisibility(product.id, product.is_active)
+                      }
+                      className={`px-3 py-1 rounded text-sm font-medium ${
+                        product.is_active
+                          ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                          : 'bg-green-100 text-green-700 hover:bg-green-200'
+                      }`}
+                    >
+                      {product.is_active ? 'Hide' : 'Show'}
+                    </button>
+                    <button
+                      onClick={() => handleDeleteProduct(product.id)}
+                      className="px-3 py-1 rounded text-sm font-medium bg-red-100 text-red-700 hover:bg-red-200"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
     </div>
   )
 }
